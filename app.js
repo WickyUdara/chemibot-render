@@ -1,24 +1,25 @@
 const express = require('express')
 const cors = require('cors')
 const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('chemibot_db');
+const db = new sqlite3.Database('database.sqlite');
 const app = express()
-const port = 8000
+const port = 4000
 
 
 
 db.serialize(() => {
-    db.run("CREATE TABLE lorem (info TEXT)");
+    db.run("CREATE TABLE chemicals (c_id int NOT NULL,rfid VARCHAR(64),name VARCHAR(64),row INT(1),col INT(1),presence TINYINT(1),PRIMARY KEY(c_id))");
+    db.run("CREATE TABLE selected_items (c_id int(3),PRIMARY KEY(c_id))");
 
-    const stmt = db.prepare("INSERT INTO lorem VALUES (?)");
-    for (let i = 0; i < 10; i++) {
-        stmt.run("Ipsum " + i);
-    }
-    stmt.finalize();
+    const stmt = db.prepare("INSERT INTO chemicals (c_id,rfid,name,row,col,presence) VALUES (1,'rfidnacl','NaCl',1,1,1),(2,'rfidnaoh','NaOH',1,2,1)");
+    //for (let i = 0; i < 10; i++) {
+    //    stmt.run("Ipsum " + i);
+    //}
+    //stmt.finalize();
 
-    db.each("SELECT rowid AS id, info FROM lorem", (err, row) => {
-        console.log(row.id + ": " + row.info);
-    });
+    //db.each("SELECT rowid AS id, info FROM lorem", (err, row) => {
+      //  console.log(row.id + ": " + row.info);
+    //});
 });
 
 db.close();
