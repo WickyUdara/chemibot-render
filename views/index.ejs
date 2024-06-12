@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <%- include('partials/head') %>
+  <body>
+    <%- include('partials/navBar') %>
+
+    <div class="container mt-5">
+        <form action="order.php" method="GET">
+            <table class="table text-center">
+            <thead>
+                <tr>
+                    <th scope="col" class="text-start">Chemical Name</th>
+                    <th scope="col">Row</th>
+                    <th scope="col">Column</th>
+                    <th scope="col">Availability</th>
+                    <th scope="col" class="text-end">Select</th>
+                </tr>
+            </thead>
+            <tbody>
+            <!-- ejs -->
+
+            </tbody>
+        </table>
+        <input type="submit" class="btn btn-primary" value="Get Chemicals">
+    </form>
+</div>
+<%- include('partials/footer') %>
+  </body>
+</html>

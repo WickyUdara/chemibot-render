@@ -4,10 +4,15 @@ const cors = require('cors')
 const app = express()
 const port = 8000
 
+// set the view engine to ejs
+app.set("view engine", "ejs");
+
+app.use(express.static("public"));
+
 app.use(cors()); 
 
 app.get('/', (req, res) => {
-  res.send('Hello World GET !')
+  res.render("index");
 })
 
 app.post('/', (req, res) => {
