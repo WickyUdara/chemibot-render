@@ -25,7 +25,7 @@
                     <td><%= chem.row %></td>
                     <td><%= chem.col %></td>
                     <td><%= (chem.presence==1) ? "Available" : "Not Available" %></td>
-                    <td class='text-end'><input type='checkbox' name="<%= chem.c_id %>"></td>
+                    <td class='text-end'><input type='checkbox' name="<%= chem.c_id %>" <%= (chem.presence==1) ? "" : "disabled" %>></td>
                 </tr>
             <% } %> 
 
