@@ -2,8 +2,11 @@ const express = require('express')
 const cors = require('cors')
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('database.sqlite');
+var bodyParser = require('body-parser')
+
 const app = express()
 const port = 8000
+app.use(bodyParser.urlencoded({ extended: false }))
 
 
 
@@ -40,8 +43,32 @@ app.get('/', (req, res) => {
     });
 })
 
-app.post('/', (req, res) => {
-    res.send('Hello World POST!')
+app.get('/order', (req, res) => {
+  var data= req.query;
+  var size = Object.keys(data).length;
+  if(size>0){
+    for (const [key, value] of Object.entries(data)) {
+      console.log(`${key}: ${value}`);
+      const sql=`INSERT INTO selected_items VALUES (${key}); `;
+      db.all(sql,[],(err,rows)=>{
+        if(err){
+          return console.error(err.message);
+        }
+      })
+      const sql2=`UPDATE chemicals SET  presence = 0 WHERE c_id= ${key} ; `;
+      db.all(sql2,[],(err,rows)=>{
+        if(err){
+          return console.error(err.message);
+        }
+        res.render('order');
+
+      })
+
+
+    }
+  }
+  console.log(size);
+  
 })
 
 app.listen(port, () => {
