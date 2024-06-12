@@ -2,8 +2,8 @@ const express = require('express')
 const cors = require('cors')
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('database.sqlite');
-const app = express()
-const port = 8000
+const app = express();
+const port = 8000;
 
 
 
@@ -28,6 +28,8 @@ app.set("view engine", "ejs");
 
 app.use(express.static("public"));
 
+app.use(express.json());
+
 app.use(cors()); 
 
 app.get('/', (req, res) => {
@@ -40,8 +42,41 @@ app.get('/', (req, res) => {
     });
 })
 
-app.post('/', (req, res) => {
-    res.send('Hello World POST!')
+app.post('/order', (req, res) => {
+  const {data} = req.body;
+  if (data.length > 0) {
+    const sqld = "DELETE FROM selected_items;";
+    db.run(sqld, [], (err) => {
+      if (err) {
+        console.log(err);
+      }
+    })
+  }
+  const sql = "SELECT c.rfid, c.row, c.col FROM chemicals c, selected_items s WHERE c.c_id = s.c_id;";
+  db.all(sql, [], (err, rows) => {
+      if (err) {
+          return console.error(err.message);
+      }
+      res.send(rows);
+  });
+})
+
+app.post('/putchem', (req, res) => {
+  const {rfid} = req.body;
+  console.log(rfid);
+  const sqlu = "UPDATE chemicals SET presence = 1 WHERE rfid = ?;"
+  db.run(sqlu, [rfid], (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+  })
+  const sql = "SELECT row, col FROM chemicals WHERE rfid = ?;"
+  db.all(sql, [rfid], (err, rows) => {
+    if (err) {
+        return console.error(err.message);
+    }
+    res.send(rows);
+  });
 })
 
 app.listen(port, () => {
