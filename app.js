@@ -42,6 +42,35 @@ app.get('/', (req, res) => {
     });
 })
 
+app.get('/order', (req, res) => {
+  var data= req.query;
+  var size = Object.keys(data).length;
+  if(size>0){
+    for (const [key, value] of Object.entries(data)) {
+      console.log(`${key}: ${value}`);
+      const sql=`INSERT INTO selected_items VALUES (${key}); `;
+      db.all(sql,[],(err,rows)=>{
+        if(err){
+          return console.error(err.message);
+        }
+      })
+      const sql2=`UPDATE chemicals SET  presence = 0 WHERE c_id= ${key} ; `;
+      db.all(sql2,[],(err,rows)=>{
+        if(err){
+          return console.error(err.message);
+        }
+        
+
+      })
+
+
+    }
+  }
+  
+  console.log(size);
+  res.render('order');
+})
+
 app.post('/order', (req, res) => {
   const {data} = req.body;
   if (data.length > 0) {
