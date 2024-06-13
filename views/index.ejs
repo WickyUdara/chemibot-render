@@ -25,7 +25,7 @@
                     <td><%= chem.row %></td>
                     <td><%= chem.col %></td>
                     <td><%= (chem.presence==1) ? "Available" : "Not Available" %></td>
-                    <td class='text-end'><input type='checkbox' name="<%= chem.c_id %>" <%= (chem.presence==1) ? "" : "disabled" %>></td>
+                    <td class='text-end'><input type='checkbox' class="chems"  name="<%= chem.c_id %>" <%= (chem.presence==1) ? "" : "disabled" %>></td>
                 </tr>
             <% } %> 
 
@@ -33,6 +33,34 @@
         </table>
         <input type="submit" class="btn btn-primary" value="Get Chemicals">
     </form>
+    <script>
+        
+        // add onchange="checkChems()"
+        function checkChems() {
+            const chems = document.querySelectorAll(".chems");
+            let count = 0;
+            console.log(chems);
+            chems.forEach(chem => {
+                if (chem.checked) {
+                    count++;
+                }
+            });
+            if (count >= 5) {
+                chems.forEach(chem => {
+                if (!chem.checked) {
+                    chem.disabled = true;
+                }
+            }); 
+            }
+            else {
+                chems.forEach(chem => {
+                if (!chem.checked) {
+                    chem.disabled = false;
+                }
+            });
+            }
+        }
+    </script>
 </div>
 <%- include('partials/footer') %>
   </body>

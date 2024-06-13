@@ -67,7 +67,7 @@ app.get('/order', (req, res) => {
     }
   }
   
-  console.log(size);
+  //console.log(size);
   res.render('order');
 })
 
@@ -106,6 +106,36 @@ app.post('/putchem', (req, res) => {
     }
     res.send(rows);
   });
+})
+
+app.post('/insert', (req, res) => {
+  const {c_id, rfid, name, row, col, presence} = req.body;
+  
+  const sql = "INSERT INTO chemicals(c_id, rfid, name, row, col, presence) VALUES (?, ?, ?, ?, ?, ?)";
+  db.run(sql, [c_id, rfid, name, row, col, presence], (err) => {
+    if (err) {
+      res.send({message : "Data Not Added"});
+      return console.log(err);
+      
+    }
+    res.send({message : "Data Added"});
+  })
+  
+})
+
+app.post('/delete', (req, res) => {
+  const {rfid} = req.body;
+  
+  const sql = "DELETE FROM chemicals WHERE rfid = ?";
+  db.run(sql, [rfid], (err) => {
+    if (err) {
+      res.send({message : "Data Not Deleted"});
+      return console.log(err);
+      
+    }
+    res.send({message : "Data Deleted"});
+  })
+  
 })
 
 app.listen(port, () => {
