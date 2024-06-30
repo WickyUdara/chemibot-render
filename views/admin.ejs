@@ -3,7 +3,9 @@
   <%- include('partials/head') %>
   <body>
     <%- include('partials/navBar') %>
-
+    <div class="container">
+        <h1>Heading</h1>
+    </div>
     <div class="container mt-5">
         <h1 class="display-4"><%-username %></h1>
         <form action="/order" method="GET">
@@ -72,6 +74,6 @@
         }
     </script>
 </div>
-<%- include('partials/footer') %>
+    <%- include('partials/footer') %>
   </body>
 </html>
