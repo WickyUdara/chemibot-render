@@ -219,6 +219,16 @@ app.post("/putchem", (req, res) => {
   });
 });
 
+app.post("/allchems", (req, res) => {
+  const sql = "SELECT rfid, row, col FROM chemicals WHERE c_id != 0;";
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    res.send(rows);
+  });
+});
+
 app.post("/insert", (req, res) => {
   const { c_id, rfid, name, row, col, presence } = req.body;
 
