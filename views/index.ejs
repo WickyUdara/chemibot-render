@@ -35,7 +35,7 @@
                     <td><%= chem.row %></td>
                     <td><%= chem.col %></td>
                     <td><%= (chem.presence==1) ? "Available" : "Not Available" %></td>
-                    <td class='text-end'><input type='checkbox' class="chems"  name="<%= chem.c_id %>" <%= (chem.presence==1) ? "" : "disabled" %>></td>
+                    <td class='text-end'><input type='checkbox' class="chems"   name="<%= chem.c_id %>" onchange="checkChems()" <%= (chem.presence==1) ? "" : "disabled" %> ></td>
                 </tr>
             <% } %> 
 
@@ -43,9 +43,13 @@
         </table>
         <input type="submit" class="btn btn-primary" value="Get Chemicals">
     </form>
+    <form action="/putchem" method="GET" class="my-5">
+        <p>Place chemicals on the chemical Tray and click this button to put them back on the shelf.</p>
+        <input type="submit" class="btn btn-primary" value="Put Chemicals">
+    </form>
     <script>
         
-        // add onchange="checkChems()"
+        //add onchange="checkChems()"
         function checkChems() {
             const chems = document.querySelectorAll(".chems");
             let count = 0;
