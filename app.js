@@ -208,6 +208,18 @@ app.post('/update-chemical/:id', (req, res) => {
   });
 });
 
+app.get("/putchem", (req, res) => {
+  const sql = `INSERT INTO selected_items VALUES (0);`;
+
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      return console.error(err.message);
+    }
+  });
+
+  res.render("putchem");
+});
+
 app.post("/putchem", (req, res) => {
   const { rfid } = req.body;
   console.log(rfid);
