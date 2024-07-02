@@ -153,13 +153,11 @@ app.get('/order', (req, res) => {
           return console.error(err.message);
         }
       })
-      const sql2=`UPDATE chemicals SET  presence = 0 WHERE c_id= ${key} ; `;
+      const sql2=`UPDATE chemicals SET presence = 0 WHERE c_id= ${key} ; `;
       db.all(sql2,[],(err,rows)=>{
         if(err){
           return console.error(err.message);
         }
-        
-
       })
 
 
@@ -167,7 +165,7 @@ app.get('/order', (req, res) => {
   }
   
   //console.log(size);
-  res.render('order');
+  res.render('order',{user:req.session.user});
 })
 
 app.post('/order', (req, res) => {
@@ -188,6 +186,23 @@ app.post('/order', (req, res) => {
       res.send(rows);
   });
 })
+
+app.post('/update-chemical/:id', (req, res) => {
+  const id = req.params.id;
+  const { exd, mfd, rfid, name } = req.body;
+
+  const sql = `UPDATE chemicals SET exd = ?, mfd = ?, rfid = ?, name= ? WHERE c_id = ?`;
+  const params = [exd, mfd, rfid,name, id];
+
+  db.run(sql, params, function(err) {
+    if (err) {
+      console.error(err.message);
+      res.json({ success: false });
+      return;
+    }
+    res.json({ success: true });
+  });
+});
 
 app.post('/putchem', (req, res) => {
   const {rfid} = req.body;

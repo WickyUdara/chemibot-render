@@ -4,76 +4,129 @@
   <body>
     <%- include('partials/navBar') %>
     <div class="container">
-        <h1>Heading</h1>
+      <h1>Heading</h1>
     </div>
     <div class="container mt-5">
-        <h1 class="display-4"><%-username %></h1>
-        <form action="/order" method="GET">
-            <table class="table text-center">
-            <thead>
-                <tr>
-                    <th scope="col" class="text-start">Chemical Name</th>
-                    <th scope="col">Expire Date</th>
-                    <th scope="col">Manufacture Date</th>
-
-                    <th scope="col">Row</th>
-                    <th scope="col">Column</th>
-                    <th scope="col">Availability</th>
-                    <th scope="col" class="text-end">Select</th>
-                </tr>
-            </thead>
-            <tbody>
+      <h1 class="display-4"><%- username %></h1>
+      <form action="/order" method="GET">
+        <table class="table text-center">
+          <thead>
+            <tr>
+              <th scope="col" class="text-start">Chemical Name</th>
+              <th scope="col">Expire Date</th>
+              <th scope="col">Manufacture Date</th>
+              <th scope="col">RFID</th>
+              <th scope="col">Row</th>
+              <th scope="col">Column</th>
+              <th scope="col">Availability</th>
+              <th scope="col" class="text-end">Select</th>
+              <th scope="col" class="text-end">Edit</th>
+            </tr>
+          </thead>
+          <tbody>
             <!-- ejs -->
-
             <% for (const chem of model) { %>
-                <tr>
-                    <td class='text-start'><%= chem.name %></td>
-                    <td><% if (new Date(chem.exd) < new Date()) { %>
-                        <span style="color: white; background-color: red;" class="btn btn-red"><%= chem.exd %></span>
-                    <% } else { %>
-                        <span><%= chem.exd %></span>
-                    <% } %></td>
-                    <td><%= chem.mfd %></td>
-                    <td><%= chem.row %></td>
-                    <td><%= chem.col %></td>
-                    <td><%= (chem.presence==1) ? "Available" : "Not Available" %></td>
-                    <td class='text-end'><input type='checkbox' class="chems"  name="<%= chem.c_id %>" <%= (chem.presence==1) ? "" : "disabled" %>></td>
-                </tr>
-            <% } %> 
-
-            </tbody>
+              <tr>
+                <td class="text-start">
+                    <input type="text" name="name-<%= chem.c_id %>" value="<%= chem.name %>" disabled class="text-input"></td>
+                <td>
+                  <input type="date" name="exd-<%= chem.c_id %>" value="<%= chem.exd %>" disabled class="date-input">
+                </td>
+                <td>
+                  <input type="date" name="mfd-<%= chem.c_id %>" value="<%= chem.mfd %>" disabled class="date-input">
+                </td>
+                <td>
+                  <input type="text" name="rfid-<%= chem.c_id %>" value="<%= chem.rfid %>" disabled class="text-input">
+                </td>
+                <td><%= chem.row %></td>
+                <td><%= chem.col %></td>
+                <td><%= chem.presence == 1 ? "Available" : "Not Available" %></td>
+                <td class="text-end">
+                  <input type="checkbox" class="chems" name="<%= chem.c_id %>" <%= chem.presence == 1 ? "" : "disabled" %>>
+                </td>
+                <td class="text-end">
+                  <button type="button" class="btn btn-primary edit-btn" data-id="<%= chem.c_id %>">Edit</button>
+                </td>
+              </tr>
+            <% } %>
+          </tbody>
         </table>
         <input type="submit" class="btn btn-primary" value="Get Chemicals">
-    </form>
-    <script>
-        
+      </form>
+      <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          const editButtons = document.querySelectorAll('.edit-btn');
+
+          editButtons.forEach(button => {
+            button.addEventListener('click', (event) => {
+              const id = event.target.getAttribute('data-id');
+              const row = event.target.closest('tr');
+              const dateInputs = row.querySelectorAll('.date-input');
+              const textInputs = row.querySelectorAll('.text-input');
+
+              const allInputs = [...dateInputs, ...textInputs];
+
+              allInputs.forEach(input => {
+                input.disabled = !input.disabled;
+              });
+
+              if (!allInputs[0].disabled) {
+                event.target.textContent = 'Save';
+              } else {
+                // Save the changes
+                const exd = row.querySelector(`[name="exd-${id}"]`).value;
+                const mfd = row.querySelector(`[name="mfd-${id}"]`).value;
+                const rfid = row.querySelector(`[name="rfid-${id}"]`).value;
+                const name = row.querySelector(`[name="name-${id}"]`).value;
+
+                fetch(`/update-chemical/${id}`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({ exd, mfd, rfid, name })
+                })
+                .then(response => response.json())
+                .then(data => {
+                  if (data.success) {
+                    alert('Chemical updated successfully');
+                  } else {
+                    alert('Failed to update chemical');
+                  }
+                });
+
+                event.target.textContent = 'Edit';
+              }
+            });
+          });
+        });
+
         // add onchange="checkChems()"
         function checkChems() {
-            const chems = document.querySelectorAll(".chems");
-            let count = 0;
-            console.log(chems);
+          const chems = document.querySelectorAll('.chems');
+          let count = 0;
+          console.log(chems);
+          chems.forEach(chem => {
+            if (chem.checked) {
+              count++;
+            }
+          });
+          if (count >= 5) {
             chems.forEach(chem => {
-                if (chem.checked) {
-                    count++;
-                }
+              if (!chem.checked) {
+                chem.disabled = true;
+              }
             });
-            if (count >= 5) {
-                chems.forEach(chem => {
-                if (!chem.checked) {
-                    chem.disabled = true;
-                }
-            }); 
-            }
-            else {
-                chems.forEach(chem => {
-                if (!chem.checked) {
-                    chem.disabled = false;
-                }
+          } else {
+            chems.forEach(chem => {
+              if (!chem.checked) {
+                chem.disabled = false;
+              }
             });
-            }
+          }
         }
-    </script>
-</div>
+      </script>
+    </div>
     <%- include('partials/footer') %>
   </body>
 </html>
