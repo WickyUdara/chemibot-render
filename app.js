@@ -155,19 +155,21 @@ app.get("/order", (req, res) => {
         if (err) {
           return console.error(err.message);
         }
-      });
-      const sql2 = `UPDATE chemicals SET  presence = 0 WHERE c_id= ${key} ; `;
-      db.all(sql2, [], (err, rows) => {
-        if (err) {
+      })
+      const sql2=`UPDATE chemicals SET presence = 0 WHERE c_id= ${key} ; `;
+      db.all(sql2,[],(err,rows)=>{
+        if(err){
           return console.error(err.message);
         }
-      });
+      })
+
+
     }
   }
 
   //console.log(size);
-  res.render("order");
-});
+  res.render('order',{user:req.session.user});
+})
 
 app.post("/order", (req, res) => {
   const { data } = req.body;
@@ -187,18 +189,23 @@ app.post("/order", (req, res) => {
     }
     res.send(rows);
   });
-});
+})
 
-app.get("/putchem", (req, res) => {
-  const sql = `INSERT INTO selected_items VALUES (0);`;
+app.post('/update-chemical/:id', (req, res) => {
+  const id = req.params.id;
+  const { exd, mfd, rfid, name } = req.body;
 
-  db.all(sql, [], (err, rows) => {
+  const sql = `UPDATE chemicals SET exd = ?, mfd = ?, rfid = ?, name= ? WHERE c_id = ?`;
+  const params = [exd, mfd, rfid,name, id];
+
+  db.run(sql, params, function(err) {
     if (err) {
-      return console.error(err.message);
+      console.error(err.message);
+      res.json({ success: false });
+      return;
     }
+    res.json({ success: true });
   });
-
-  res.render("putchem");
 });
 
 app.post("/putchem", (req, res) => {
