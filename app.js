@@ -221,21 +221,22 @@ app.get("/putchem", (req, res) => {
 });
 
 app.post("/putchem", (req, res) => {
-  const { rfid } = req.body;
-  console.log(rfid);
+  const { data } = req.body;
+  console.log(data);
   const sqlu = "UPDATE chemicals SET presence = 1 WHERE rfid = ?;";
-  db.run(sqlu, [rfid], (err) => {
+  db.run(sqlu, [data], (err) => {
     if (err) {
       return console.error(err.message);
     }
   });
-  const sql = "SELECT row, col FROM chemicals WHERE rfid = ?;";
-  db.all(sql, [rfid], (err, rows) => {
-    if (err) {
-      return console.error(err.message);
-    }
-    res.send(rows);
-  });
+  res.send({"Confirmation" : data})
+  // const sql = "SELECT row, col FROM chemicals WHERE rfid = ?;";
+  // db.all(sql, [data], (err, rows) => {
+  //   if (err) {
+  //     return console.error(err.message);
+  //   }
+  //   res.send(rows);
+  // });
 });
 
 app.post("/allchems", (req, res) => {
