@@ -229,7 +229,7 @@ app.post("/putchem", (req, res) => {
       return console.error(err.message);
     }
   });
-  res.send({"Confirmation" : data})
+  res.send({"Confirmation" : data});
   // const sql = "SELECT row, col FROM chemicals WHERE rfid = ?;";
   // db.all(sql, [data], (err, rows) => {
   //   if (err) {
