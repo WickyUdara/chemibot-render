@@ -12,6 +12,9 @@ const port = 8000;
 //db.serialize(() => {
 //  db.run("CREATE TABLE chemicals (c_id INT NOT NULL, rfid VARCHAR(64), name VARCHAR(64), mfd TEXT, exd TEXT, row INT, col INT, presence INT, PRIMARY KEY(c_id))");
 //  db.run("CREATE TABLE selected_items (c_id INT, PRIMARY KEY(c_id))");
+//  db.run("CREATE TABLE IF NOT EXISTS statistics (c_id INT, count INT, PRIMARY KEY(c_id), FOREIGN KEY(c_id) REFERENCES chemicals(c_id))");
+//  db.run("ALTER TABLE statistics ADD COLUMN borrowed_at TEXT");
+//  db.run("ALTER TABLE statistics ADD COLUMN count INT");
 
 // const stmt = db.prepare("INSERT INTO chemicals (c_id, rfid, name, mfd, exd, row, col, presence) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 
@@ -127,7 +130,7 @@ app.get("/dashboard", isAuthenticated, (req, res) => {
     if (err) {
       return console.error(err.message);
     }
-    res.render("index", { model: rows, username: req.session.user.username });
+    res.render("index", { model: rows, username: req.session.user.username ,user: req.session.user});
   });
 });
 app.get("/admin-dashboard", isAuthenticated, isAdmin, (req, res) => {
@@ -136,14 +139,26 @@ app.get("/admin-dashboard", isAuthenticated, isAdmin, (req, res) => {
     if (err) {
       return console.error(err.message);
     }
-    res.render("admin", { model: rows, username: req.session.user.username });
+    res.render("admin", { model: rows, username: req.session.user.username,user: req.session.user });
+  });
+});
+app.get("/admin-stat", isAuthenticated, isAdmin, (req, res) => {
+  const sql = `
+    SELECT c.name, s.borrowed_at, 
+           (SELECT COUNT(*) FROM selected_items si WHERE si.c_id = s.c_id) AS count
+    FROM statistics s
+    JOIN chemicals c ON s.c_id = c.c_id`;
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    res.render('stat', { user: req.session.user, statistics: rows });
   });
 });
 app.get("/logout", (req, res) => {
   req.session.destroy();
   res.redirect("/");
 });
-
 app.get("/order", (req, res) => {
   var data = req.query;
   var size = Object.keys(data).length;
@@ -162,14 +177,32 @@ app.get("/order", (req, res) => {
           return console.error(err.message);
         }
       })
+      const sql3 = `INSERT OR IGNORE INTO statistics (c_id, count, borrowed_at) VALUES (${key}, 1, ?)`;
+              const currentDateTime = new Date().toISOString();
+              db.run(sql3, [ currentDateTime], (err) => {
+                if (err) {
+                  return reject(err);
+                }
 
+                // Update statistics table to increment count and set borrowed_at
+                const sql4 = `UPDATE statistics SET count = count + 1, borrowed_at = ? WHERE c_id = ${key}`;
+                db.run(sql4, [currentDateTime], (err) => {
+                  if (err) {
+                    return reject(err);
+                  }
 
+                  
+                });
+              });
     }
   }
 
   //console.log(size);
   res.render('order',{user:req.session.user});
 })
+
+
+
 
 app.post("/order", (req, res) => {
   const { data } = req.body;

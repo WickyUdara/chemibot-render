@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <%- include('partials/head') %>
+  <body>
+    <%- include('partials/navBar') %>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Chemical Name', 'Selection Count'],
+          <% statistics.forEach(stat => { %>
+            ['<%= stat.name %>', <%= stat.count %>],
+          <% }); %>
+        ]);
+
+        var options = {
+          title: 'Chemical Selection Statistics'
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+        chart.draw(data, options);
+      }
+    </script>
+    <div id="piechart" style="width: 900px; height: 500px;"></div>
+    <div class="container">
+  
+
+      <h2>Statistics</h2>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col">Chemical Name</th>
+            <th scope="col">Last Borrowed At</th>
+            <th scope="col">Selection Count</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% statistics.forEach(stat => { %>
+            <tr>
+              <td><%= stat.name %></td>
+              
+              <td><%= stat.borrowed_at %></td>
+              <td><%= stat.count %></td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+
+      <a class="btn btn-primary text-decoration-none my-5" href="/admin-dashboard">Go to Home</a>
+    </div>
+    <%- include('partials/footer') %>
+  </body>
+</html>
