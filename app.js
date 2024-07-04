@@ -143,11 +143,8 @@ app.get("/admin-dashboard", isAuthenticated, isAdmin, (req, res) => {
   });
 });
 app.get("/admin-stat", isAuthenticated, isAdmin, (req, res) => {
-  const sql = `
-    SELECT c.name, s.borrowed_at, 
-           (SELECT COUNT(*) FROM selected_items si WHERE si.c_id = s.c_id) AS count
-    FROM statistics s
-    JOIN chemicals c ON s.c_id = c.c_id`;
+  const sql = `SELECT c.name, s.count,s.borrowed_at FROM statistics s
+               JOIN chemicals c ON s.c_id = c.c_id`;
   db.all(sql, [], (err, rows) => {
     if (err) {
       return console.error(err.message);
@@ -185,7 +182,7 @@ app.get("/order", (req, res) => {
                 }
 
                 // Update statistics table to increment count and set borrowed_at
-                const sql4 = `UPDATE statistics SET count = count + 1, borrowed_at = ? WHERE c_id = ${key}`;
+                const sql4 = `UPDATE statistics SET borrowed_at = ?,count = count + 1  WHERE c_id = ${key}`;
                 db.run(sql4, [currentDateTime], (err) => {
                   if (err) {
                     return reject(err);
