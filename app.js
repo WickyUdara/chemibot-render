@@ -247,7 +247,7 @@ app.get("/putchem", (req, res) => {
     }
   });
 
-  res.render("putchem");
+  res.render("putchem", { user: req.session.user });
 });
 
 app.post("/putchem", (req, res) => {
