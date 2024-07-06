@@ -216,7 +216,23 @@ app.post("/order", (req, res) => {
     });
   }
   const sql =
-    "SELECT c.rfid, c.row, c.col FROM chemicals c, selected_items s WHERE c.c_id = s.c_id;";
+    `SELECT c.rfid, c.row, c.col 
+    FROM chemicals c, selected_items s 
+    WHERE c.c_id = s.c_id
+    ORDER BY 
+      CASE c.row
+        WHEN 2 THEN 1
+        WHEN 3 THEN 2
+        WHEN 1 THEN 3
+      END DESC,
+      CASE c.col
+        WHEN 3 THEN 1
+        WHEN 2 THEN 2
+        WHEN 4 THEN 3
+        WHEN 1 THEN 4
+        WHEN 5 THEN 5
+      END DESC, 
+      c.col`;
   db.all(sql, [], (err, rows) => {
     if (err) {
       return console.error(err.message);
