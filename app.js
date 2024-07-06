@@ -77,6 +77,10 @@ app.use(express.json());
 
 app.use(cors());
 
+app.use((req, res, next) => {
+  res.locals.currentRoute = req.path;
+  next();
+});
 function isAuthenticated(req, res, next) {
   if (req.session.user) {
     next();
@@ -156,7 +160,7 @@ app.get("/logout", (req, res) => {
   req.session.destroy();
   res.redirect("/");
 });
-app.get("/order", (req, res) => {
+app.get("/order", isAuthenticated, (req, res) => {
   var data = req.query;
   var size = Object.keys(data).length;
   if (size > 0) {
@@ -238,7 +242,7 @@ app.post('/update-chemical/:id', (req, res) => {
   });
 });
 
-app.get("/putchem", (req, res) => {
+app.get("/putchem", isAuthenticated, (req, res) => {
   const sql = `INSERT INTO selected_items VALUES (0);`;
 
   db.all(sql, [], (err, rows) => {
