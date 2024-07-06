@@ -5,7 +5,10 @@
     <%- include('partials/navBar') %>
     <div class="container text-center my-5">
         <h1>Put back Chemicals into the shelf</h1>
-        <a class="btn btn-primary text-decoration-none my-5" href="<%= user.isAdmin ? '/admin-dashboard' : '/dashboard' %>">Go to Home</a>
+        <a class="btn btn-dark text-decoration-none my-5 p-3" href="<%= user.isAdmin ? '/admin-dashboard' : '/dashboard' %>">Go Back Home</a><br>
+        <img src="download.gif" alt="Loading GIF" style="width: 400px; height: auto;">
+
+        
     </div>
 <%- include('partials/footer') %>
   </body>

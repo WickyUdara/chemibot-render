@@ -5,48 +5,54 @@
     <%- include('partials/navBar') %>
 
     <div class="container mt-5">
-        <h1 class="display-4"><%-username %></h1>
-        <form action="/order" method="GET">
-            <table class="table text-center">
-            <thead>
-                <tr>
-                    <th scope="col" class="text-start">Chemical Name</th>
-                    <th scope="col">Expire Date</th>
-                    <th scope="col">Manufacture Date</th>
+        <div class="row my-3 mb-4">
+            <h1 class="display-5  col-md-10" style="text-transform: capitalize; border-radius: 5px;"><%- username %></h1>
+    
+            <div class="col-md-2">
+              <form action="/putchem" method="GET">
+                <input type="submit" class="btn btn-secondary w-100" value="Put Chemicals">
+              </form>
+            </div>
+          </div>
+          <hr>
+          <div class="container">
+            <div class="row my-3">
+              <div class="col-md-12">
+                <form action="/order" method="GET">
+                  <input type="submit" class="btn btn-dark w-100 mb-3" value="Get Chemicals">
+                    <table class="table text-center">
+                    <thead>
+                        <tr>
+                            <th scope="col" class="text-start">Chemical Name</th>
+                            <th scope="col">Expire Date</th>
+                            <th scope="col">Manufacture Date</th>
 
-                    <th scope="col">Row</th>
-                    <th scope="col">Column</th>
-                    <th scope="col">Availability</th>
-                    <th scope="col" class="text-end">Select</th>
-                </tr>
-            </thead>
-            <tbody>
-            <!-- ejs -->
+                            <th scope="col">Row</th>
+                            <th scope="col">Column</th>
+                            <th scope="col">Availability</th>
+                            <th scope="col" class="text-end">Select</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <!-- ejs -->
+                
+                    <% for (const chem of model) { %>
+                        <tr class="<%= new Date(chem.exd) < new Date() ? 'table-danger' : 'table-secondary' %>">
+                            <td class='text-start'><%= chem.name %></td>
+                            <td><%= chem.exd %></td>
+                            <td><%= chem.mfd %></td>
+                            <td><%= chem.row %></td>
+                            <td><%= chem.col %></td>
+                            <td><%= (chem.presence==1) ? "Available" : "Not Available" %></td>
+                            <td class='text-end'><input type='checkbox' class="<%= (chem.presence==1) ? 'chems' : ''%>"   name="<%= chem.c_id %>" onchange="checkChems()" <%= (chem.presence==1) ? "" : "disabled" %> ></td>
+                        </tr>
+                    <% } %> 
 
-            <% for (const chem of model) { %>
-                <tr>
-                    <td class='text-start'><%= chem.name %></td>
-                    <td><% if (new Date(chem.exd) < new Date()) { %>
-                        <span style="color: white; background-color: red;" class="btn btn-red"><%= chem.exd %></span>
-                    <% } else { %>
-                        <span><%= chem.exd %></span>
-                    <% } %></td>
-                    <td><%= chem.mfd %></td>
-                    <td><%= chem.row %></td>
-                    <td><%= chem.col %></td>
-                    <td><%= (chem.presence==1) ? "Available" : "Not Available" %></td>
-                    <td class='text-end'><input type='checkbox' class="<%= (chem.presence==1) ? 'chems' : ''%>"   name="<%= chem.c_id %>" onchange="checkChems()" <%= (chem.presence==1) ? "" : "disabled" %> ></td>
-                </tr>
-            <% } %> 
-
-            </tbody>
-        </table>
-        <input type="submit" class="btn btn-primary" value="Get Chemicals">
+                    </tbody>
+                </table>
+        
     </form>
-    <form action="/putchem" method="GET" class="my-5">
-        <p>Place chemicals on the chemical Tray and click this button to put them back on the shelf.</p>
-        <input type="submit" class="btn btn-primary" value="Put Chemicals">
-    </form>
+    
     <script>
         
         //add onchange="checkChems()"
